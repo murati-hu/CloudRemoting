@@ -17,17 +17,17 @@
     Optional - Name of the Address property to be filtered
 
 .EXAMPLE
-    Get-Ec2Instance i-ade67df | Get-EC2InstanceAddress
+    Get-Ec2Instance i-2492acfc  | Select -ExpandProperty Instances | Get-EC2InstanceAddress
 .EXAMPLE
-    Get-Ec2Instance i-ade67df | Get-EC2InstanceAddress -AddressProperty PublicDnsName
+    Get-Ec2Instance i-2492acfc  | Select -ExpandProperty Instances | Get-EC2InstanceAddress -AddressProperty PublicDnsName
 #>
 function Get-EC2InstanceAddress {
     [cmdletbinding()]
     param(
-        [Parameter(ValueFromPipeline=$true)]
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance]$InstanceObject,
 
-        [ValidateSet('PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
+        [ValidateSet($null,'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
         [string]$AddressProperty
     )
     if ($InstanceObject) {

@@ -7,6 +7,11 @@
 
     Th cmdlet uses cmdkey.exe in the background to enable credential passthrough.
 
+.PARAMETER InstanceId
+    Mandatory - EC2 Instance Id for the target machine
+.PARAMETER Region
+    Mandatory - Region parameter for the EC2 Instance if -InstanceID is
+    specified.
 .PARAMETER Reservation
     Accepts an EC2 Reservation pipeline input from Get-Ec2Instance output.
 .PARAMETER Instance
@@ -15,30 +20,39 @@
     Mandatory - Path to the PrivateKey file to decrypt
 .PARAMETER AddressProperty
     Optional - String to try to use a specific private or public address
+
 .EXAMPLE
-    Get-Ec2Instance i-ade67df | Enter-EC2RdpSession -PemFile '~/ssh/ec2-dev.pem'
+    Get-Ec2Instance i-2492acfc | Enter-EC2RdpSession -PemFile '~/ssh/ec2-dev.pem'
+.EXAMPLE
+    Enter-EC2RdpSession -InstanceId i-2492acfc -Region us-west-2 -PemFile '~/ssh/ec2-dev.pem'
 #>
 function Enter-EC2RdpSession {
-    [cmdletbinding()]
+    [CmdletBinding(DefaultParameterSetName='ByInstanceId')]
     param(
+        [Parameter(Mandatory=$true,ParameterSetName="ByInstanceId")]
+        [string]$InstanceId,
+
+        [Parameter(Mandatory=$true,ParameterSetName="ByInstanceId")]
+        [string]$Region,
+
         [Parameter(ParameterSetName="ByReservationObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Reservation]$Reservation,
 
         [Parameter(ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance[]]$Instance,
 
+        [Parameter(Mandatory,ParameterSetName="ByInstanceId")]
         [Parameter(Mandatory,ParameterSetName="ByInstanceObject")]
         [Parameter(Mandatory,ParameterSetName="ByReservationObject")]
         [ValidateScript({Test-Path -Path $_ })]
         [string]$PemFile,
 
-        [Parameter(ParameterSetName="ByInstanceObject")]
-        [Parameter(ParameterSetName="ByReservationObject")]
-        [ValidateSet('PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
+        [ValidateSet($null, 'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
         [string]$AddressProperty='PrivateIpAddress'
     )
 
     Process {
+        if ($InstanceId) { $Reservation = Get-EC2Instance -Instance $InstanceId -Region $Region }
         if ($Reservation) { $Instance = $Reservation.Instances }
 
         foreach ($i in $Instance) {

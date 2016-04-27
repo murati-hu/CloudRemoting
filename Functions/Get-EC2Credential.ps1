@@ -20,31 +20,42 @@
     Get-ECInstance -InstanceId i-d56ef3 | Get-EC2Credential -PemFile '~/ssh/ec2-dev.pem'
 #>
 function Get-EC2Credential {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ByInstanceId')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText","")]
     param(
-        [Parameter(ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
-        [Amazon.EC2.Model.Instance]$InstanceObject,
-
-        [Parameter(Mandatory, ParameterSetName="ByInstanceId")]
+        [Parameter(Mandatory=$true, ParameterSetName="ByInstanceId")]
         [string]$InstanceId,
 
-        [Parameter(Mandatory, ParameterSetName="ByInstanceId")]
+        [Parameter(Mandatory=$true, ParameterSetName="ByInstanceId")]
         [string]$Region,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
+        [Amazon.EC2.Model.Instance]$InstanceObject,
+        
+        [Parameter(Mandatory=$true,ParameterSetName="ByReservationObject", ValueFromPipeline=$true)]
+        [Amazon.EC2.Model.Reservation]$Reservation,
+
+        [Parameter(Mandatory, ParameterSetName="ByInstanceId")]
+        [Parameter(Mandatory, ParameterSetName="ByInstanceObject")]
+        [Parameter(Mandatory, ParameterSetName="ByReservationObject")]
         [ValidateScript({Test-Path -Path $_ })]
         [string]$PemFile,
 
         [switch]$AsText
     )
 
-    Write-Debug "ParameterSet: $($PsCmdlet.ParameterSetName)"
+    Write-Verbose "ParameterSet: $($PsCmdlet.ParameterSetName)"
+
+    if ($Reservation) { $InstanceObject = $Reservation.Instances | Select-Object -First 1 }
 
     if ($InstanceObject) {
         $InstanceId = $InstanceObject.InstanceId
         $Region = $InstanceObject.Placement.AvailabilityZone -replace '\w$',''
+        Write-Verbose "Required Private-key: $($InstanceObject.KeyName)"
     }
 
+    Write-Verbose "Fetching Credentials for $InstanceId@$Region"
+    Write-Verbose "Keyfile used: $PemFile"
     $rawPassword = Get-EC2PasswordData -Region $Region -InstanceId $InstanceId -Decrypt -PemFile $PemFile
     if ($AsText) { return $rawPassword }
 
