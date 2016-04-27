@@ -1,0 +1,7 @@
+Name
+Enter-EC2PSSession
+Enter-EC2RdpSession
+Enter-RdpSession
+Get-EC2Credential
+Get-EC2InstanceAddress
+New-EC2PSSession
