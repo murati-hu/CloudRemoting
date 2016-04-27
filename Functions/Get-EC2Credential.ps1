@@ -1,5 +1,26 @@
+<#
+.SYNOPSIS
+    Returns Administrator credentials for an EC2 Instance
+.DESCRIPTION
+    The cmdlet accepts pipeline input of EC2 instances and requires a
+    private-key file to decrypt and logon with the administrator credentials.
 
+.PARAMETER InstanceObject
+    Accepts an EC2 Reservation pipeline input from Get-Ec2Instance output.
+.PARAMETER InstanceId
+    Accepts an Amazon EC2 Instance object from the pipeline
+.PARAMETER Region
+    Mandatory - AWS Region if InstanceId is specified instead of InstanceObject
+.PARAMETER PemFile
+    Mandatory - Path to the PrivateKey file to decrypt
+
+.EXAMPLE
+    Get-EC2Credential -InstanceId i-d56ef3 -PemFile '~/ssh/ec2-dev.pem' -Region us-west-2
+.EXAMPLE
+    Get-ECInstance -InstanceId i-d56ef3 | Get-EC2Credential -PemFile '~/ssh/ec2-dev.pem'
+#>
 function Get-EC2Credential {
+    [CmdletBinding()]
     param(
         [Parameter(ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance]$InstanceObject,
@@ -8,7 +29,6 @@ function Get-EC2Credential {
         [string]$InstanceId,
 
         [Parameter(Mandatory, ParameterSetName="ByInstanceId")]
-        #[ValidateScript]
         [string]$Region,
 
         [Parameter(Mandatory)]
