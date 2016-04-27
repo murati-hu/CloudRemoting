@@ -1,6 +1,6 @@
 install:
   - cinst pester
-  - cinst awstools.powershell
+  - ps: Install-Module -Name AWSPowerShell
 
 build: false
 
