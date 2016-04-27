@@ -1,3 +1,3 @@
 ## 0.0.1 (Mar 10, 2016)
-- Initial version of `EC2Remoting` to establish `PSSession`s and `RdpSession` to
+- Initial version of `CloudRemoting` to establish `PSSession` and `RdpSession` to
  EC2 Instances with an EC2 PrivateKey

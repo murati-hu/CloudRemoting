@@ -1,5 +1,5 @@
 #
-# Module manifest for 'EC2Remoting' module
+# Module manifest for 'CloudRemoting' module
 # Created by: Akos Murati <akos@murati.hu>
 # Generated on: 02/28/2016
 #
@@ -7,7 +7,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'EC2Remoting.psm1'
+RootModule = 'CloudRemoting.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.0.1.0'
@@ -69,7 +69,7 @@ scripted and automated remote management of EC2 Instances in Amazon AWS.
 # Functions to export from this module
 FunctionsToExport = @(
     'Enter-RdpSession'
-    'Enter-Ec2RdpSession'
+    'Enter-EC2RdpSession'
 
     'New-EC2PSSession'
     'Enter-EC2PSSession'
@@ -85,7 +85,10 @@ FunctionsToExport = @(
 # VariablesToExport = '*'
 
 # Aliases to export from this module
-# AliasesToExport = '*'
+AliasesToExport = @(
+    'rdp'
+    'ec2rdp'
+)
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
