@@ -1,0 +1,6 @@
+/.vscode/
+/build/
+Test.xml
+vendor/packages/
+*.sandbox.ps1
+TestsResults.xml

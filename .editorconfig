@@ -1,0 +1,19 @@
+﻿# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Default to all files
+[*]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Powershell source files
+[*.{ps1,psm1,psd1}]
+indent_style = space
+indent_size = 4
+
+[*.{xml,ps1xml,config,json}]
+indent_style = space
+indent_size = 2
