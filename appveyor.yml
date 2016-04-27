@@ -1,6 +1,7 @@
 install:
   - cinst pester
-  - ps: Install-Module -Name AWSPowerShell
+  - ps: (new-object net.webclient).DownloadFile('http://sdk-for-net.amazonwebservices.com/latest/AWSToolsAndSDKForNet.msi', 'AWSToolsAndSDKForNet.msi')
+  - ps: msiexec /i AWSToolsAndSDKForNet.msi /quiet /qn /norestart /log install.log
 
 build: false
 
