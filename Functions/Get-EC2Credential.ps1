@@ -31,16 +31,15 @@ function Get-EC2Credential {
 
         [Parameter(ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance]$InstanceObject,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName="ByReservationObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Reservation]$Reservation,
 
-        [Parameter(Mandatory, ParameterSetName="ByInstanceId")]
-        [Parameter(Mandatory, ParameterSetName="ByInstanceObject")]
-        [Parameter(Mandatory, ParameterSetName="ByReservationObject")]
+        [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ })]
         [string]$PemFile,
 
+        [Parameter()]
         [switch]$AsText
     )
 

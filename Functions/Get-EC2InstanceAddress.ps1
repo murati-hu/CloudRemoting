@@ -27,6 +27,7 @@ function Get-EC2InstanceAddress {
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance]$InstanceObject,
 
+        [Parameter()]
         [ValidateSet($null,'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
         [string]$AddressProperty
     )

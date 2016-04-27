@@ -39,12 +39,11 @@ function Enter-EC2PSSession {
         [Parameter(Mandatory=$true,ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance[]]$Instance,
 
-        [Parameter(ParameterSetName="ByInstanceId", Mandatory=$true)]
-        [Parameter(ParameterSetName="ByInstanceObject", Mandatory=$true)]
-        [Parameter(ParameterSetName="ByReservationObject", Mandatory=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ })]
         [string]$PemFile,
 
+        [Parameter()]
         [ValidateSet($null, 'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
         [string]$AddressProperty
     )
