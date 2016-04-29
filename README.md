@@ -32,10 +32,17 @@ Import-Module CloudRemoting
 ```powershell
 # EC2 Administrator RDP Sessions
 Get-Ec2Instance i-2492acfc | Enter-EC2RdpSession -PemFile '~/.ssh/myprivatekey.pem'
+```
 
+<div style='height: 200px'><img src='https://cloud.githubusercontent.com/assets/2268036/14919371/9d4ae4de-0e7c-11e6-8175-1998412f11da.gif' style='position: absolute; clip: rect(0px,800px,180px,0px); min-height: 200px;' /></div>
+
+```powershell
 # EC2 Administrator PSRemoting
 Get-Ec2Instance i-2492acfc | New-EC2PSSession -PemFile '~/.ssh/myprivatekey.pem'
 ```
+<div style='height: 200px'><img src='https://cloud.githubusercontent.com/assets/2268036/14919352/8a8cb82c-0e7c-11e6-9260-23a0fa4dd912.gif' style='position: absolute; clip: rect(0px,800px,180px,0px); min-height: 200px;' /></div>
+
+
 All EC2 cmdlets relies on the official [`AWSPowershell`][AWSPowershell] module.
 It expects the module to be installed with valid AWS credentials setup.
 
