@@ -17,7 +17,7 @@ CloudRemoting is available via [PowerShellGallery][PowerShellGallery] and via
 Install-Module CloudRemoting
 
 # Or install it from this repository
-Install-Module -ModuleUrl https://github.com/muratiakos/CloudRemoting/archive/master.zip
+Install-Module -ModuleUrl https://github.com/murati-hu/CloudRemoting/archive/master.zip
 ```
 Of course you can download and install the module manually too from
 [Downloads][download]
@@ -90,12 +90,12 @@ Created and maintained by [Akos Murati][muratiakos] (<akos@murati.hu>).
 ## License
 Apache License, Version 2.0 (see [LICENSE][LICENSE])
 
-[repo]: https://github.com/muratiakos/CloudRemoting
-[issues]: https://github.com/muratiakos/CloudRemoting/issues
+[repo]: https://github.com/murati-hu/CloudRemoting
+[issues]: https://github.com/murati-hu/CloudRemoting/issues
 [muratiakos]: http://murati.hu
 [license]: LICENSE
 [semver]: http://semver.org/
 [psget]: http://psget.net/
-[download]: https://github.com/muratiakos/CloudRemoting/archive/master.zip
+[download]: https://github.com/murati-hu/CloudRemoting/archive/master.zip
 [PowerShellGallery]: https://www.powershellgallery.com
 [AWSPowershell]: https://aws.amazon.com/powershell

@@ -10,7 +10,7 @@
 RootModule = 'CloudRemoting.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.1.0'
+ModuleVersion = '0.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'd58ec090-b8b8-40ee-8292-049de3f17f4c'
@@ -125,31 +125,33 @@ PrivateData = @{
             'PSSession',
             'Remote',
 
+            'cmdkey',
             'mstsc',
             'rdp',
             'ts',
             'Remote Desktop',
-            'Terminal Services Client'
+            'Terminal Services Client',
+            'Windows Credential Store'
         )
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/muratiakos/CloudRemoting/LICENSE'
+        LicenseUri = 'https://github.com/murati-hu/CloudRemoting/LICENSE'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/muratiakos/CloudRemoting'
+        ProjectUri = 'https://github.com/murati-hu/CloudRemoting'
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = 'https://github.com/murati-hu/CloudRemoting/CHANGELOG.md'
 
     } # End of PSData hashtable
 
 } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-HelpInfoURI = 'https://github.com/muratiakos/CloudRemoting'
+HelpInfoURI = 'https://github.com/murati-hu/CloudRemoting'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
