@@ -113,7 +113,7 @@ PrivateData = @{
 
             'KeyPair',
             'PrivateKey',
-            'Private Key',
+            'Private','Key',
             'Password-less'
             'Administrator',
             'Credential',
