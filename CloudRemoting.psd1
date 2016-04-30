@@ -129,9 +129,9 @@ PrivateData = @{
             'mstsc',
             'rdp',
             'ts',
-            'Remote Desktop',
-            'Terminal Services Client',
-            'Windows Credential Store'
+            'Remote', 'Desktop',
+            'Terminal','Services','Client',
+            'Windows','Credential','Store'
         )
 
         # A URL to the license for this module.
