@@ -47,12 +47,14 @@ function Enter-RdpSession {
         Write-Verbose "Adding Credentials for $ComputerName to Windows Credential Store"
         $rdcProcess.StartInfo.FileName = [Environment]::ExpandEnvironmentVariables("%SystemRoot%\system32\cmdkey.exe")
         $rdcProcess.StartInfo.Arguments = "/generic:TERMSRV/$ComputerName /user:$($Credential.UserName) /pass:`"$Password`""
+        $rdcProcess.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
         [void]$rdcProcess.Start()
     }
 
     Write-Verbose "Connecting to RDP Session: $ComputerName"
     $rdcProcess.StartInfo.FileName = [Environment]::ExpandEnvironmentVariables("%SystemRoot%\system32\mstsc.exe")
     $rdcProcess.StartInfo.Arguments = "/v $ComputerName"
+    $rdcProcess.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Normal
     [void]$rdcProcess.Start()
 
 

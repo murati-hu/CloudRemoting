@@ -17,7 +17,7 @@ CloudRemoting is available via [PowerShellGallery][PowerShellGallery] and via
 Install-Module CloudRemoting
 
 # Or install it from this repository
-Install-Module -ModuleUrl https://github.com/muratiakos/CloudRemoting/archive/master.zip
+Install-Module -ModuleUrl https://github.com/murati-hu/CloudRemoting/archive/master.zip
 ```
 Of course you can download and install the module manually too from
 [Downloads][download]
@@ -28,19 +28,31 @@ Import-Module CloudRemoting
 ```
 
 ## Few Examples
-### EC2 Instance Remoting with Private-Key file
+### Enter an EC2 Admin RDP Session with Private-Key file
+You can use the `Enter-EC2RdpSession` cmdlet or its `ec2rdp` alias to connect to any EC2 instance as an administrator via RDP.
 ```powershell
-# EC2 Administrator RDP Sessions
 Get-Ec2Instance i-2492acfc | Enter-EC2RdpSession -PemFile '~/.ssh/myprivatekey.pem'
-
-# EC2 Administrator PSRemoting
-Get-Ec2Instance i-2492acfc | New-EC2PSSession -PemFile '~/.ssh/myprivatekey.pem'
 ```
-All EC2 cmdlets relies on the official [`AWSPowershell`][AWSPowershell] module.
+![ec2_rdp_session](https://cloud.githubusercontent.com/assets/2268036/14919383/ae1d3438-0e7c-11e6-9026-d995fb2deb50.gif)
+
+
+### Open EC2 Admin PSSessions with Private-Key
+Similarly to the native `PSSession` cmdlets, you can use the `New-EC2PSSession` and `Enter-EC2RdpSession` commands to create or enter to any EC2 PSSession as an administrator:
+```powershell
+# Enter to a single EC2 PSSession
+Get-Ec2Instance i-2492acfc | Enter-EC2PSSession -PemFile '~/.ssh/myprivatekey.pem'
+
+# Create multiple EC2 PSSessions for further operations
+Get-Ec2Instance -Filter @{name='tag:env'; value='demo'} | New-EC2PSSession -PemFile '~/.ssh/myprivatekey.pem'
+```
+![ec2_multiple_pssession](https://cloud.githubusercontent.com/assets/2268036/14919352/8a8cb82c-0e7c-11e6-9260-23a0fa4dd912.gif)
+
+Please note that all EC2 cmdlets rely on the official [`AWSPowershell`][AWSPowershell] module.
 It expects the module to be installed with valid AWS credentials setup.
 
 
 ### RemoteDesktop to any machine
+In order to connect to any machine via RDP, you can simply call `Enter-RdpSession` cmdlet or its `rdp` alias.
 ```powershell
 # Connect an RDP Session to any machine
 $c = Get-EC2Credential # Or retrieve from a persisted creds
@@ -78,12 +90,12 @@ Created and maintained by [Akos Murati][muratiakos] (<akos@murati.hu>).
 ## License
 Apache License, Version 2.0 (see [LICENSE][LICENSE])
 
-[repo]: https://github.com/muratiakos/CloudRemoting
-[issues]: https://github.com/muratiakos/CloudRemoting/issues
+[repo]: https://github.com/murati-hu/CloudRemoting
+[issues]: https://github.com/murati-hu/CloudRemoting/issues
 [muratiakos]: http://murati.hu
 [license]: LICENSE
 [semver]: http://semver.org/
 [psget]: http://psget.net/
-[download]: https://github.com/muratiakos/CloudRemoting/archive/master.zip
+[download]: https://github.com/murati-hu/CloudRemoting/archive/master.zip
 [PowerShellGallery]: https://www.powershellgallery.com
 [AWSPowershell]: https://aws.amazon.com/powershell
