@@ -36,7 +36,7 @@ function Get-EC2Credential {
         [Amazon.EC2.Model.Reservation]$Reservation,
 
         [Parameter()]
-        [ValidateScript({Test-Path -Path $_ })]
+        [ValidateScript({Test-EC2PemFile $_ })]
         [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]

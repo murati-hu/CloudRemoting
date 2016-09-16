@@ -40,7 +40,7 @@ function Enter-EC2PSSession {
         [Amazon.EC2.Model.Instance[]]$Instance,
 
         [Parameter()]
-        [ValidateScript({Test-Path -Path $_ })]
+        [ValidateScript({Test-EC2PemFile $_ })]
         [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
