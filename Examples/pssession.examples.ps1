@@ -9,9 +9,10 @@
 #>
 
 [CmdletBinding()]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost","")]
 param(
     [string]$InstanceId,
-    [string]$Region=$(Get-DefaultAWSRegion | Select -ExpandProperty Region),
+    [string]$Region=$(Get-DefaultAWSRegion | Select-Object -ExpandProperty Region),
     [string]$KeyPath="~/.ssh",
     [string]$PemFile=$(Join-Path $KeyPath "aws_dev_keypair.pem")
 )

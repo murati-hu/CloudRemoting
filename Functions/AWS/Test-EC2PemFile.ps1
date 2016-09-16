@@ -20,5 +20,5 @@ function Test-EC2PemFile {
 
     $exists = Test-Path -Path $PemFile
     $nonempty = -Not [string]::IsNullOrWhiteSpace((Get-Content -Raw -Path $PemFile))
-    return  $exists -and $nonempty
+    return $exists -and $nonempty
 }
