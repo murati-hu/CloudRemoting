@@ -42,7 +42,7 @@ function New-EC2PSSession {
         [Amazon.EC2.Model.Instance[]]$Instance,
 
         [Parameter()]
-        [ValidateScript({Test-EC2PemFile $_ })]
+        [ValidateNotNullOrEmpty()]
         [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
@@ -52,6 +52,8 @@ function New-EC2PSSession {
         #Authentication Mechanism
         #[System.Management.Automation.Runspaces.AuthenticationMechanism]$Authentication
     )
+
+    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop }
 
     Process {
         if ($InstanceId) {

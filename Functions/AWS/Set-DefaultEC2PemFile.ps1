@@ -16,9 +16,11 @@ function Set-DefaultEC2PemFile {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions","")]
     param(
         [Parameter(Mandatory=$true,Position=0)]
-        [ValidateScript({Test-EC2PemFile $_ })]
+        [ValidateNotNullOrEmpty()]
         [string]$PemFile
     )
+    Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop
+
     Write-Verbose "Setting `$script:DefaultEc2PemFile to $PemFile"
     $script:DefaultEc2PemFile = Resolve-Path $PemFile
 }

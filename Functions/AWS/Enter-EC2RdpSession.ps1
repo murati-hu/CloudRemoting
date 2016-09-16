@@ -42,13 +42,15 @@ function Enter-EC2RdpSession {
         [Amazon.EC2.Model.Instance[]]$Instance,
 
         [Parameter()]
-        [ValidateScript({Test-EC2PemFile $_ })]
+        [ValidateNotNullOrEmpty()]
         [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
         [ValidateSet($null, 'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
         [string]$AddressProperty='PrivateIpAddress'
     )
+
+    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop }
 
     Process {
         if ($InstanceId) { $Reservation = Get-EC2Instance -Instance $InstanceId -Region $Region }

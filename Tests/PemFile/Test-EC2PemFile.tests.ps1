@@ -5,7 +5,7 @@ Describe "Test-EC2PemFile validation" {
     $notEmptyFile = Join-Path $PSScriptRoot '../PemFile/notempty.txt'
 
     it "should return false if not specified" {
-        Test-EC2PemFile -ErrorAction SilentlyContinue | Should Be $false
+        Test-EC2PemFile -ErrorAction 0 | Should Be $false
     }
     it "should return false on invalid files" {
         Test-EC2PemFile -PemFile $null -ErrorAction 0 | Should Be $false

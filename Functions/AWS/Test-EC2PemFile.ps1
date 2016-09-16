@@ -13,12 +13,21 @@ function Test-EC2PemFile {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param(
-        [Parameter(Mandatory=$true,Position=0)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter(Position=0)]
         [string]$PemFile
     )
 
-    $exists = Test-Path -Path $PemFile
-    $nonempty = -Not [string]::IsNullOrWhiteSpace((Get-Content -Raw -Path $PemFile))
-    return $exists -and $nonempty
+    try {
+        Write-Verbose "Testing $PemFile path.."
+        if (-Not (Test-Path -Path $PemFile -ErrorAction Stop)) { throw }
+
+        Write-Verbose "Testing if content is not empty.."
+        $content = Get-Content -Raw -Path $PemFile -ErrorAction Stop
+        if([string]::IsNullOrWhiteSpace($content)) { throw }
+
+        return $true
+    } catch {
+        Write-Error "Please provide the path to a valid PemFile."
+    }
+    return $false
 }
