@@ -13,6 +13,7 @@
 #>
 function Set-DefaultEC2PemFile {
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions","")]
     param(
         [Parameter(Mandatory=$true,Position=0)]
         [ValidateScript({Test-EC2PemFile $_ })]

@@ -5,3 +5,5 @@ Enter-RdpSession
 Get-EC2Credential
 Get-EC2InstanceAddress
 New-EC2PSSession
+Test-EC2PemFile
+Set-DefaultEC2Pemfile
