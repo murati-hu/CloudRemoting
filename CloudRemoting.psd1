@@ -10,7 +10,7 @@
 RootModule = 'CloudRemoting.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.0.0'
+ModuleVersion = '0.2.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'd58ec090-b8b8-40ee-8292-049de3f17f4c'
@@ -76,6 +76,9 @@ FunctionsToExport = @(
 
     'Get-EC2Credential'
     'Get-EC2InstanceAddress'
+
+    'Set-DefaultEC2PemFile'
+    'Test-EC2PemFile'
 )
 
 # Cmdlets to export from this module
@@ -112,6 +115,8 @@ PrivateData = @{
             'Instance',
 
             'KeyPair',
+            'Pem',
+            'PemFile',
             'PrivateKey',
             'Private','Key',
             'Password-less'
