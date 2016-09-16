@@ -2,6 +2,7 @@ CloudRemoting PowerShell module
 ===============================
 
 [![Build status](https://ci.appveyor.com/api/projects/status/kdc6a75b8wludjq6?svg=true)](https://ci.appveyor.com/project/muratiakos/cloudremoting)
+[![Join the chat at https://gitter.im/murati-hu/CloudRemoting](https://badges.gitter.im/murati-hu/CloudRemoting.svg)](https://gitter.im/murati-hu/CloudRemoting?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 CloudRemoting module provides an easy and scriptable way to connect to EC2, Azure
 or to other machines via RDP or PSRemoting sessions on top of the standard
@@ -13,11 +14,11 @@ cmdlets by:
 CloudRemoting is available via [PowerShellGallery][PowerShellGallery] and via
 [PsGet][psget], so you can simply install it with the following command:
 ```powershell
-# Install it from PowerShellGallery / PsGet repos
+# Install it from PowerShell Gallery with PS5 / psget.net for older PS versions
 Install-Module CloudRemoting
 
-# Or install it from this repository
-Install-Module -ModuleUrl https://github.com/murati-hu/CloudRemoting/archive/latest.zip
+# Or install it directly from this repository with psget.net
+psget\Install-Module -ModuleUrl -ModuleUrl https://github.com/murati-hu/CloudRemoting/archive/latest.zip
 ```
 Of course you can download and install the module manually too from
 [Downloads][download]
