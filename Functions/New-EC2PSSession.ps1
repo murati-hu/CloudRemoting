@@ -41,9 +41,9 @@ function New-EC2PSSession {
         [Parameter(Mandatory=$true,ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance[]]$Instance,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter()]
         [ValidateScript({Test-Path -Path $_ })]
-        [string]$PemFile,
+        [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
         [ValidateSet($null, 'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
