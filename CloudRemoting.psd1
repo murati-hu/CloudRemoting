@@ -93,6 +93,7 @@ VariablesToExport = @()
 AliasesToExport = @(
     'rdp'
     'ec2rdp'
+    'ec2sn'
 )
 
 # DSC resources to export from this module
