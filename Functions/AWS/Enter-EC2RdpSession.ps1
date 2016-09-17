@@ -50,7 +50,7 @@ function Enter-EC2RdpSession {
         [string]$AddressProperty='PrivateIpAddress'
     )
 
-    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop }
+    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop | Out-Null }
 
     Process {
         if ($InstanceId) { $Reservation = Get-EC2Instance -Instance $InstanceId -Region $Region }

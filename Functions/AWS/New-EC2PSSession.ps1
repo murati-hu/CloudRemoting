@@ -53,7 +53,7 @@ function New-EC2PSSession {
         #[System.Management.Automation.Runspaces.AuthenticationMechanism]$Authentication
     )
 
-    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop }
+    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop | Out-Null }
 
     Process {
         if ($InstanceId) {

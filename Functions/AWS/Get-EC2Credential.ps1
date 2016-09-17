@@ -45,7 +45,7 @@ function Get-EC2Credential {
 
     Write-Verbose "ParameterSet: $($PsCmdlet.ParameterSetName)"
 
-    Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop
+    Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop | Out-Null
     $PemFile = Resolve-Path $PemFile
 
     if ($Reservation) { $InstanceObject = $Reservation.Instances | Select-Object -First 1 }
