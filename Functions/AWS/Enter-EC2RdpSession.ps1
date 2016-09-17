@@ -41,14 +41,16 @@ function Enter-EC2RdpSession {
         [Parameter(ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance[]]$Instance,
 
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ })]
-        [string]$PemFile,
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
         [ValidateSet($null, 'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
         [string]$AddressProperty='PrivateIpAddress'
     )
+
+    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop | Out-Null }
 
     Process {
         if ($InstanceId) { $Reservation = Get-EC2Instance -Instance $InstanceId -Region $Region }

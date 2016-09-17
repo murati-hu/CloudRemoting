@@ -35,9 +35,9 @@ function Get-EC2Credential {
         [Parameter(Mandatory=$true,ParameterSetName="ByReservationObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Reservation]$Reservation,
 
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ })]
-        [string]$PemFile,
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
         [switch]$AsText
@@ -45,7 +45,9 @@ function Get-EC2Credential {
 
     Write-Verbose "ParameterSet: $($PsCmdlet.ParameterSetName)"
 
+    Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop | Out-Null
     $PemFile = Resolve-Path $PemFile
+
     if ($Reservation) { $InstanceObject = $Reservation.Instances | Select-Object -First 1 }
 
     if ($InstanceObject) {

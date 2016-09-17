@@ -41,9 +41,9 @@ function New-EC2PSSession {
         [Parameter(Mandatory=$true,ParameterSetName="ByInstanceObject", ValueFromPipeline=$true)]
         [Amazon.EC2.Model.Instance[]]$Instance,
 
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ })]
-        [string]$PemFile,
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$PemFile=$script:DefaultEc2PemFile,
 
         [Parameter()]
         [ValidateSet($null, 'PrivateIpAddress','PublicIpAddress','PrivateDnsName','PublicDnsName')]
@@ -52,6 +52,8 @@ function New-EC2PSSession {
         #Authentication Mechanism
         #[System.Management.Automation.Runspaces.AuthenticationMechanism]$Authentication
     )
+
+    Begin { Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop | Out-Null }
 
     Process {
         if ($InstanceId) {
