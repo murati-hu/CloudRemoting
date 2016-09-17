@@ -48,9 +48,10 @@ Describe "Validation - With Default EC2 PemFile set" {
 
     function Test-DefaultPemFile([string]$FunctionName) {
         Context $FunctionName {
-            it "should NOT throw error if not specified" {
+            $exceptionText = 'Please provide the path to a valid PemFile.'
+            it "$FunctionName should NOT throw '$exceptionText' if not specified" {
                 $test = { . $FunctionName -InstanceId $fakeInstance -Region $fakeRegion }
-                $test | Should Not Throw
+                $test | Should Not Throw $exceptionText
             }
         }
     }
