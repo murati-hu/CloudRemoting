@@ -9,7 +9,7 @@
     Mandatory - Path to the PrivateKey file to be used by default
 
 .EXAMPLE
-    Set-EC2DefaultPemFile '~/ssh/ec2-dev.pem'
+    Set-DefaultEC2PemFile '~/ssh/ec2-dev.pem'
 #>
 function Set-DefaultEC2PemFile {
     [CmdletBinding()]
@@ -22,5 +22,5 @@ function Set-DefaultEC2PemFile {
     Test-EC2PemFile -PemFile $PemFile -ErrorAction Stop
 
     Write-Verbose "Setting `$script:DefaultEc2PemFile to $PemFile"
-    $script:DefaultEc2PemFile = Resolve-Path $PemFile
+    $script:DefaultEc2PemFile = Resolve-Path $PemFile | Select-Object -ExpandProperty Path
 }

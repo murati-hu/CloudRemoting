@@ -77,6 +77,8 @@ FunctionsToExport = @(
     'Get-EC2Credential'
     'Get-EC2InstanceAddress'
 
+    'Clear-DefaultEC2PemFile'
+    'Get-DefaultEC2PemFile'
     'Set-DefaultEC2PemFile'
     'Test-EC2PemFile'
 )
