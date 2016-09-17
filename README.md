@@ -43,8 +43,9 @@ Similarly to the native `PSSession` cmdlets, you can use the `New-EC2PSSession` 
 # Enter to a single EC2 PSSession
 Get-Ec2Instance i-2492acfc | Enter-EC2PSSession -PemFile '~/.ssh/myprivatekey.pem'
 
-# Create multiple EC2 PSSessions for further operations
-Get-Ec2Instance -Filter @{name='tag:env'; value='demo'} | New-EC2PSSession -PemFile '~/.ssh/myprivatekey.pem'
+# Set Default EC2 PemFile and create multiple EC2 PSSessions
+Set-DefaultEC2PemFile -PemFile '~/.ssh/myprivatekey.pem'
+Get-Ec2Instance -Filter @{name='tag:env'; value='demo'} | New-EC2PSSession
 ```
 ![ec2_multiple_pssession](https://cloud.githubusercontent.com/assets/2268036/14919352/8a8cb82c-0e7c-11e6-9260-23a0fa4dd912.gif)
 
