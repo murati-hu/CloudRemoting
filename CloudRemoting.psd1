@@ -81,6 +81,8 @@ FunctionsToExport = @(
     'Get-DefaultEC2PemFile'
     'Set-DefaultEC2PemFile'
     'Test-EC2PemFile'
+
+    'Invoke-SSMCommand'
 )
 
 # Cmdlets to export from this module
