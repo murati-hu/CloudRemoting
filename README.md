@@ -5,10 +5,11 @@ CloudRemoting PowerShell module
 [![Join the chat at https://gitter.im/murati-hu/CloudRemoting](https://badges.gitter.im/murati-hu/CloudRemoting.svg)](https://gitter.im/murati-hu/CloudRemoting?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 CloudRemoting module provides an easy and scriptable way to connect to EC2, Azure
-or to other machines via RDP or PSRemoting sessions on top of the standard
+or to other machines via RDP, PSRemoting and SSM sessions on top of the standard
 cmdlets by:
  - Seamless EC2 Administrator Credential decryption for RDP and PSRemoting
  - Credential pass-through for RDP Sessions
+ - Pipeline integrated SSM Run Command execution
 
 ## Installation
 CloudRemoting is available via [PowerShellGallery][PowerShellGallery] and via
@@ -59,6 +60,14 @@ In order to connect to any machine via RDP, you can simply call `Enter-RdpSessio
 # Connect an RDP Session to any machine
 $c = Get-EC2Credential # Or retrieve from a persisted creds
 Enter-RdpSession -ComputerName '207.47.222.251' -Credential $c
+```
+
+### Integrated SSM Command execution
+Running AWS SSM Run commands allow us to execute scripts from anywhere against EC2 Instances, but
+`Invoke-SSMCommand` makes this task even easier to fully integrate this feature to PowerShell pipelines.
+```powershell
+# Execute scripts with SSM Run Command similarly as Invoke-Command
+Get-Ec2Instance i-2492acfc | Invoke-SSMCommand { iisreset }
 ```
 
 ## Documentation
