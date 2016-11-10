@@ -10,7 +10,7 @@
 RootModule = 'CloudRemoting.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.3.0.0'
+ModuleVersion = '0.4.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'd58ec090-b8b8-40ee-8292-049de3f17f4c'
@@ -29,7 +29,8 @@ Description = @'
 AWS EC2 KeyPair based passwordless Rdp and PSRemoting module to support
 scripted and automated remote management of EC2 Instances in Amazon AWS.
 
-The module also provides an Invoke-Command like cmdlet for AWS SSM Run Command.
+The module also provides an Invoke-Command like cmdlet for AWS SSM Run command
+that fully integrates to PowerShell with optional CliXml serialization.
 '@
 
 # Minimum version of the Windows PowerShell engine required by this module
