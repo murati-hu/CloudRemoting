@@ -40,6 +40,9 @@
     Optional - Parameter Hash to be passed as key-value pairs to
     the SSM Document.
 
+.PARAMETER EnableCliXml
+    Optional - Switch to enable PowerShell CliXml serialization
+    for custom scriptblocks and deserialization for any response
 
 .EXAMPLE
     Get-Ec2Instance | Invoke-SSMCommand { iisreset }
@@ -81,7 +84,14 @@ function Invoke-SSMCommand {
         [string]$OutputS3BucketName,
 
         [Parameter()]
-        [string]$OutputS3KeyPrefix
+        [string]$OutputS3KeyPrefix,
+
+        [Parameter()]
+        [Alias('CliXml')]
+        [switch]$EnableCliXml,
+
+        [Parameter()]
+        [System.Int32]$TimeoutSecond
     )
 
     Begin {
@@ -105,10 +115,20 @@ function Invoke-SSMCommand {
         }
 
         if($DocumentName -eq 'AWS-RunPowerShellScript') {
-            $Parameter = @{ 'commands'=@(
-                '$ConfirmPreference = "None"'
-                $ScriptBlock.ToString()
-            ) }
+            if ($EnableCliXml) {
+                Write-Verbose "Wrapping Scriptblock for CLIXML.."
+                $Parameter = @{'commands'=@(
+                    '$ConfirmPreference = "None"'
+                    '$tempFile = [System.IO.Path]::GetTempFileName()'
+                    "& { $($ScriptBlock.ToString()) } | Export-Clixml -Path `$tempFile"
+                    'Get-Content -Path $tempFile'
+                )}
+            } else {
+                $Parameter = @{'commands'=@(
+                    '$ConfirmPreference = "None"'
+                    $ScriptBlock.ToString()
+                )}
+            }
         }
         
         if (-Not $instanceId) {
@@ -122,12 +142,13 @@ function Invoke-SSMCommand {
         $SSMCommandArgs = @{
             InstanceId=$InstanceId
             DocumentName=$DocumentName
-            Comment="Invoked by $($env:USERNAME)@$($env:USERDOMAIN) from $($env:COMPUTERNAME)"
+            Comment="Invoked by $($env:USERNAME)@$($env:USERDOMAIN) from CloudRemoting@$($env:COMPUTERNAME)"
         }
 
         if ($Parameter) { $SSMCommandArgs.Parameter = $Parameter }
         if ($OutputS3BucketName) { $SSMCommandArgs.OutputS3BucketName = $OutputS3BucketName }
         if ($OutputS3KeyPrefix) { $SSMCommandArgs.OutputS3KeyPrefix = $OutputS3KeyPrefix }
+        if ($TimeoutSecond) { $SSMCommandArgs.TimeoutSecond = $TimeoutSecond }
 
         try {
             $ssmCommand=Send-SSMCommand @SSMCommandArgs
@@ -156,6 +177,8 @@ function Invoke-SSMCommand {
             if (-Not $result.Output) { Write-Warning "No output was received from '$i'" }
             $output = $result.Output
             
+            Write-Debug "Raw content received.."
+            Write-Debug $output
             try {
                 Write-Verbose "Decoding output.."
                 $output = [System.Web.HttpUtility]::HtmlDecode($result.Output)
@@ -173,7 +196,7 @@ function Invoke-SSMCommand {
 
             Write-Verbose "Checking truncation.."
             $TRUNCATE_REGEX = '-+Output truncated-+'
-            if ($output -imatch $TRUNCATE_REGEX) {
+            if ([string]::IsNullOrWhiteSpace($output) -or $output -imatch $TRUNCATE_REGEX) {
                 if (-NOT $OutputS3BucketName -or -not $OutputS3KeyPrefix) {
                     Write-Warning "Output is truncated from '$i'."
                     Write-Warning "In order to get full output, set -OutputS3BucketName and -OutputS3KeyPrefix"
@@ -183,8 +206,24 @@ function Invoke-SSMCommand {
                     Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/stdout.txt" -File $tempFile | Out-Null
                     $output = Get-Content -Path $tempFile -Raw
                     Remove-Item -Path $tempFile -Force -Recurse
+
+                    Write-Debug "Full content downloaded.."
+                    Write-Debug $output
                 }
             }
+
+            if ($EnableCliXml) {
+                Write-Verbose "Try Parsing output as CMLIXML"
+                try {
+                    $cliXml = [System.IO.Path]::GetTempFileName()
+                    Set-Content -Path $cliXml -Value $output
+                    $output = Import-Clixml -Path $cliXml
+                    Remove-Item -Path $cliXml -Force
+                } catch {
+                    Write-Error $_.Exception
+                }
+            }
+
             Write-Verbose "Returning output.."
             $output
         }
