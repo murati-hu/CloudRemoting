@@ -9,4 +9,6 @@ Test-EC2PemFile
 Clear-DefaultEC2Pemfile
 Get-DefaultEC2Pemfile
 Set-DefaultEC2Pemfile
+Set-DefaultSSMOutput
+Clear-DefaultSSMOutput
 Invoke-SSMCommand
