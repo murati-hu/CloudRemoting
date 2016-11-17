@@ -118,10 +118,7 @@ function Invoke-SSMCommand {
         }
         elseif ($DocumentName -eq 'AWS-RunShellScript') {
             Write-Verbose "Running with generic Shell ScriptBlock.."
-            $Parameter = @{'commands'=@(
-                '$ConfirmPreference = "None"'
-                $ScriptBlock.ToString()
-            )}
+            $Parameter = @{'commands'=@($ScriptBlock.ToString())}
         }
     }
 
@@ -142,7 +139,7 @@ function Invoke-SSMCommand {
         foreach ($i in $Instance) {
             $id = $i.InstanceId
             $Region = ($i | Select-Object -ExpandProperty Placement | Select-Object -ExpandProperty AvailabilityZone) -replace '\w$',''
-            
+
             Write-Verbose "Targeting: $id @ $Region"
             Write-Verbose "Executing $DocumentName with `n $($Parameter.Keys | ForEach-Object { $Parameter.$_ | Out-String }).."
 
@@ -173,10 +170,10 @@ function Invoke-SSMCommand {
             }
         }
     }
-    
+
     end {
         Write-Verbose "Collecting results $($script:SSMInvocations)"
-        
+
         while ($script:SSMInvocations.Keys.Count -gt 0) {
             $id = $script:SSMInvocations.Keys | Select-Object -First 1
             $i = $script:SSMInvocations.$id
