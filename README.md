@@ -68,6 +68,10 @@ Running AWS SSM Run commands allow us to execute scripts from anywhere against E
 ```powershell
 # Execute scripts with SSM Run Command similarly as Invoke-Command
 Get-Ec2Instance i-2492acfc | Invoke-SSMCommand { iisreset }
+
+# Execute SSM alias, with a CLI serialized command via S3 output
+Set-DefaultSSMOutput -BucketName 'ssm-outputs' -KeyPrefix 'logs/'
+Get-Ec2Instance i-2492acfc | ssm { Get-WebSite } -EnableCliXml | Select Name
 ```
 
 ## Documentation

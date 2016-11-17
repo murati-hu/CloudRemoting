@@ -94,26 +94,11 @@ function Invoke-SSMCommand {
         [System.Int32]$TimeoutSecond
     )
 
-    Begin {
+    begin {
         Add-Type -AssemblyName System.Web
-    }
+        $script:SSMInvocations = @{}
 
-    Process {
-        if ($Reservation) { $Instance = $Reservation.Instances }
-
-        if (-Not $InstanceId) {
-            Write-Verbose "Expanding InstanceId and Region from instance set"
-            $InstanceId = $Instance | Select-Object -ExpandProperty InstanceId
-            $Region = ($Instance | Select-Object -ExpandProperty Placement -First 1 | Select-Object -ExpandProperty AvailabilityZone) -replace '\w$',''
-        }
-
-        if (-Not $Region) {
-            Write-Warning "Region is not set, execution may fail.."
-        } else {
-            Write-Verbose "Setting region to $Region .."
-            Set-DefaultAWSRegion -Region $Region
-        }
-
+        Write-Verbose "Constructing Parameters.."
         if($DocumentName -eq 'AWS-RunPowerShellScript') {
             Write-Verbose "Running with generic PowerShell scriptblock.."
             if ($EnableCliXml) {
@@ -138,102 +123,151 @@ function Invoke-SSMCommand {
                 $ScriptBlock.ToString()
             )}
         }
-        
-        if (-Not $instanceId) {
-            Write-Warning "No instances to target, quiting."
-            continue
-        }
+    }
 
-        Write-Verbose "Targeting instances: $instanceId"
-        Write-Verbose "Executing $DocumentName with $($Parameter | Out-String).."
-
-        $SSMCommandArgs = @{
-            InstanceId=$InstanceId
-            DocumentName=$DocumentName
-            Comment="Invoked by $($env:USERNAME)@$($env:USERDOMAIN) from CloudRemoting@$($env:COMPUTERNAME)"
-        }
-
-        if ($Parameter) { $SSMCommandArgs.Parameter = $Parameter }
-        if ($OutputS3BucketName) { $SSMCommandArgs.OutputS3BucketName = $OutputS3BucketName }
-        if ($OutputS3KeyPrefix) { $SSMCommandArgs.OutputS3KeyPrefix = $OutputS3KeyPrefix }
-        if ($TimeoutSecond) { $SSMCommandArgs.TimeoutSecond = $TimeoutSecond }
-
-        try {
-            $ssmCommand=Send-SSMCommand @SSMCommandArgs
-        } catch {
-            Write-Error $_.Exception
-            continue
-        }
-
-        $Done = $false
-        while(-Not $Done) {
-            Write-Verbose "Waiting for $($ssmCommand.CommandId) - $($ssmCommand.Status) command..."
-            $ssmCommand=Get-SSMCommand -CommandId $ssmCommand.CommandId -ErrorAction SilentlyContinue
-            $Done = ($null -eq $ssmCommand) -or ($ssmCommand.Status -imatch 'Success|Fail')
-        }
-
-        foreach ($i in $InstanceId) {
-            Write-Verbose "Returning results from $i .."
-            $invocation = Get-SSMCommandInvocation -CommandId $ssmCommand.CommandId -Details $true -InstanceId $i
-            if ($invocation.TraceOutput) { Write-Warning $invocation.TraceOutput }
-
-            $result = $invocation | Select-Object -ExpandProperty CommandPlugins
-            if ($result.Status -ine 'Success') {
-                Write-Error "$($result.Name) Invocation failed on '$i' with ResponseCode $($result.ResponseCode)."
+    Process {
+        # Convert all input into Instance list
+        if ($Reservation) { $Instance = $Reservation.Instances }
+        if ($InstanceId) {
+            $Instance = $InstanceId |
+            Foreach-Object {
+                New-Object psobject -Property @{
+                    InstanceId = $_
+                    Placement = @{ AvailabilityZone="$($Region)x" }
+                }
             }
+        }
 
-            if (-Not $result.Output) { Write-Warning "No output was received from '$i'" }
-            $output = $result.Output
+        Write-Debug "Processing $Instance ..."
+        foreach ($i in $Instance) {
+            $id = $i.InstanceId
+            $Region = ($i | Select-Object -ExpandProperty Placement | Select-Object -ExpandProperty AvailabilityZone) -replace '\w$',''
             
-            Write-Debug "Raw content received.."
-            Write-Debug $output
+            Write-Verbose "Targeting: $id @ $Region"
+            Write-Verbose "Executing $DocumentName with `n $($Parameter.Keys | ForEach-Object { $Parameter.$_ | Out-String }).."
+
+            if (-Not $Region) {
+                Write-Warning "Region is not set, execution may fail.."
+            } else {
+                Write-Debug "Setting region to $Region .."
+                Set-DefaultAWSRegion -Region $Region
+            }
+
+            $SSMCommandArgs = @{
+                InstanceId=$id
+                DocumentName=$DocumentName
+                Comment="Invoked by $($env:USERNAME)@$($env:USERDOMAIN) from CloudRemoting@$($env:COMPUTERNAME)"
+            }
+
+            if ($Parameter) { $SSMCommandArgs.Parameter = $Parameter }
+            if ($OutputS3BucketName) { $SSMCommandArgs.OutputS3BucketName = $OutputS3BucketName }
+            if ($OutputS3KeyPrefix) { $SSMCommandArgs.OutputS3KeyPrefix = $OutputS3KeyPrefix }
+            if ($TimeoutSecond) { $SSMCommandArgs.TimeoutSecond = $TimeoutSecond }
+
             try {
-                Write-Verbose "Decoding output.."
-                $output = [System.Web.HttpUtility]::HtmlDecode($result.Output)
+                $ssmCommand=Send-SSMCommand @SSMCommandArgs
+                $script:SSMInvocations.$id = $ssmCommand
             } catch {
-                Write-Error "Unable to XML Decode output"
+                Write-Error $_.Exception
+                continue
             }
-
-            Write-Verbose "Separating ErrorStream.."
-            $ERROR_REGEX = '-+ERROR-+'
-            if ($output -imatch $ERROR_REGEX) {
-                $streams = $output -isplit $ERROR_REGEX
-                $output = $streams[0]
-                Write-Error "$i $($streams[1])"
-            }
-
-            Write-Verbose "Checking truncation.."
-            $TRUNCATE_REGEX = '-+Output truncated-+'
-            if ([string]::IsNullOrWhiteSpace($output) -or $output -imatch $TRUNCATE_REGEX) {
-                if (-NOT $OutputS3BucketName -or -not $OutputS3KeyPrefix) {
-                    Write-Warning "Output is truncated from '$i'."
-                    Write-Warning "In order to get full output, set -OutputS3BucketName and -OutputS3KeyPrefix"
-                } else {
-                    Write-Verbose "Fetching full output from 's3://$OutputS3BucketName/$OutputS3KeyPrefix'"
-                    $tempFile = [System.IO.Path]::GetTempFileName()
-                    Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/stdout.txt" -File $tempFile | Out-Null
-                    $output = Get-Content -Path $tempFile -Raw
-                    Remove-Item -Path $tempFile -Force -Recurse
-
-                    Write-Debug "Full content downloaded.."
-                    Write-Debug $output
-                }
-            }
-
-            if ($EnableCliXml) {
-                Write-Verbose "Try Parsing output as CMLIXML"
-                try {
-                    $cliXml = [System.IO.Path]::GetTempFileName()
-                    Set-Content -Path $cliXml -Value $output
-                    $output = Import-Clixml -Path $cliXml
-                    Remove-Item -Path $cliXml -Force
-                } catch {
-                    Write-Error $_.Exception
-                }
-            }
-
-            Write-Verbose "Returning output.."
-            $output
         }
     }
+    
+    end {
+        Write-Verbose "Collecting results $($script:SSMInvocations)"
+        
+        while ($script:SSMInvocations.Keys.Count -gt 0) {
+            $id = $script:SSMInvocations.Keys | Select-Object -First 1
+            $i = $script:SSMInvocations.$id
+            Write-Verbose "Waiting for $($i.InstanceIds) - $($i.CommandId) - $($i.Status) command..."
+            $currentCommand=Get-SSMCommand -CommandId $i.CommandId -ErrorAction SilentlyContinue
+
+            if (($null -eq $currentCommand) -or ($currentCommand.Status -imatch 'Success|Fail')) {
+                $script:SSMInvocations.Remove($id)
+                Get-SSMCommandResult -CommandId $i.CommandId -InstanceId $id -EnableCliXml:$EnableCliXml
+            }
+        }
+    }
+}
+
+function Get-SSMCommandResult {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$CommandId,
+        
+        [Parameter()]
+        [string]$InstanceId,
+
+        [Parameter()]
+        [string]$Region=$(Get-DefaultAWSRegion | Select-Object -ExpandProperty Region),
+
+        [Parameter()]
+        [switch]$EnableCliXml
+    )
+
+    Write-Verbose "Fetching results from $InstanceId - $CommandId .."
+    $invocation = Get-SSMCommandInvocation -CommandId $CommandId -Details $true -InstanceId $InstanceId
+    if ($invocation.TraceOutput) { Write-Warning $invocation.TraceOutput }
+
+    $result = $invocation | Select-Object -ExpandProperty CommandPlugins
+    if ($result.Status -ine 'Success') {
+        Write-Error "'$InstanceId': $($result.Name) invocation failed with ResponseCode $($result.ResponseCode)."
+    }
+
+    if (-Not $result.Output) { Write-Warning "No output was received from '$InstanceId'" }
+    $output = $result.Output
+            
+    Write-Debug "Raw content received.."
+    Write-Debug $output
+
+    try {
+        Write-Verbose "Trying to decode output.."
+        $output = [System.Web.HttpUtility]::HtmlDecode($result.Output)
+    } catch {
+        Write-Error "Unable to XML Decode output."
+    }
+
+    Write-Verbose "Separating ErrorStream.."
+    $ERROR_REGEX = '-+ERROR-+'
+    if ($output -imatch $ERROR_REGEX) {
+        $streams = $output -isplit $ERROR_REGEX
+        $output = $streams[0]
+        Write-Error "$i $($streams[1])"
+    }
+
+    Write-Verbose "Checking result truncation.."
+    $TRUNCATE_REGEX = '-+Output truncated-+'
+    if ([string]::IsNullOrWhiteSpace($output) -or $output -imatch $TRUNCATE_REGEX) {
+        if ($result.OutputS3BucketName) {
+            Write-Verbose "Fetching full output from 's3://$($result.OutputS3BucketName)/$($result.OutputS3KeyPrefix)'"
+            $tempFile = [System.IO.Path]::GetTempFileName()
+            Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/stdout.txt" -File $tempFile | Out-Null
+            $output = Get-Content -Path $tempFile -Raw
+            Remove-Item -Path $tempFile -Force -Recurse
+
+            Write-Debug "Full content downloaded.."
+            Write-Debug $output
+        } else {
+            Write-Warning "S3 Output was not specified, unable to fetch full output."
+        }
+    }
+
+    if ($EnableCliXml) {
+        Write-Verbose "Try Parsing output as CliXml"
+        try {
+            $cliXml = [System.IO.Path]::GetTempFileName()
+            Set-Content -Path $cliXml -Value $output
+            $output = Import-Clixml -Path $cliXml
+            Remove-Item -Path $cliXml -Force
+        } catch {
+            Write-Debug $_.Exception
+            Write-Error "Unable to parse result as CliXml"
+        }
+    }
+
+    Write-Verbose "Returning output.."
+    $output |
+    Add-Member -NotePropertyName InstanceId -NotePropertyValue $InstanceId -ErrorAction Continue -PassThru |
+    Add-Member -NotePropertyName SSMCommandInvocation -NotePropertyValue $invocation -ErrorAction Continue -PassThru
 }
