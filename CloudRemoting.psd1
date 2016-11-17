@@ -10,7 +10,7 @@
 RootModule = 'CloudRemoting.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.5.0.0'
+ModuleVersion = '0.5.1.0'
 
 # ID used to uniquely identify this module
 GUID = 'd58ec090-b8b8-40ee-8292-049de3f17f4c'
@@ -144,8 +144,10 @@ PrivateData = @{
             'cmdkey',
             'mstsc',
             'rdp',
+            'rds',
             'ts',
-            'Remote', 'Desktop',
+            'Invoke','SSM','Run','Command',
+            'Enter','Remote','Desktop',
             'Terminal','Services','Client',
             'Windows','Credential','Store'
         )
