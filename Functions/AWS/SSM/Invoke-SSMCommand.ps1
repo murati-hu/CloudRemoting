@@ -81,10 +81,10 @@ function Invoke-SSMCommand {
         [hashtable]$Parameter,
 
         [Parameter()]
-        [string]$OutputS3BucketName,
+        [string]$OutputS3BucketName=$Script:DefaultSSMOutputS3BucketName,
 
         [Parameter()]
-        [string]$OutputS3KeyPrefix,
+        [string]$OutputS3KeyPrefix=$Script:DefaultSSMOutputS3KeyPrefix,
 
         [Parameter()]
         [Alias('CliXml')]
@@ -115,6 +115,7 @@ function Invoke-SSMCommand {
         }
 
         if($DocumentName -eq 'AWS-RunPowerShellScript') {
+            Write-Verbose "Running with generic PowerShell scriptblock.."
             if ($EnableCliXml) {
                 Write-Verbose "Wrapping Scriptblock for CLIXML.."
                 $Parameter = @{'commands'=@(
@@ -129,6 +130,13 @@ function Invoke-SSMCommand {
                     $ScriptBlock.ToString()
                 )}
             }
+        }
+        elseif ($DocumentName -eq 'AWS-RunShellScript') {
+            Write-Verbose "Running with generic Shell ScriptBlock.."
+            $Parameter = @{'commands'=@(
+                '$ConfirmPreference = "None"'
+                $ScriptBlock.ToString()
+            )}
         }
         
         if (-Not $instanceId) {
@@ -159,7 +167,7 @@ function Invoke-SSMCommand {
 
         $Done = $false
         while(-Not $Done) {
-            Write-Verbose "Waiting $($ssmCommand.Status) command..."
+            Write-Verbose "Waiting for $($ssmCommand.CommandId) - $($ssmCommand.Status) command..."
             $ssmCommand=Get-SSMCommand -CommandId $ssmCommand.CommandId -ErrorAction SilentlyContinue
             $Done = ($null -eq $ssmCommand) -or ($ssmCommand.Status -imatch 'Success|Fail')
         }
