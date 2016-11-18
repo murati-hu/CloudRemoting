@@ -26,8 +26,8 @@ function Get-SSMCommandResult {
     if (-Not $result.Output) { Write-Warning "No output was received from '$InstanceId'" }
     $output = $result.Output
 
-    Write-Debug "Raw content received.."
-    Write-Debug $output
+    Write-Verbose "Raw output received.."
+    Write-Verbose $output
 
     try {
         Write-Verbose "Trying to decode output.."
@@ -48,14 +48,18 @@ function Get-SSMCommandResult {
     $TRUNCATE_REGEX = '-+Output truncated-+'
     if ([string]::IsNullOrWhiteSpace($output) -or $output -imatch $TRUNCATE_REGEX) {
         if ($result.OutputS3BucketName) {
-            Write-Verbose "Fetching full output from 's3://$($result.OutputS3BucketName)/$($result.OutputS3KeyPrefix)'"
-            $tempFile = [System.IO.Path]::GetTempFileName()
-            Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/stdout.txt" -File $tempFile | Out-Null
-            $output = Get-Content -Path $tempFile -Raw
-            Remove-Item -Path $tempFile -Force -Recurse
+            $S3Path = "s3://$($result.OutputS3BucketName)/$($result.OutputS3KeyPrefix)"
 
-            Write-Debug "Full content downloaded.."
-            Write-Debug $output
+            try {
+                Write-Verbose "Fetching full output from $S3Path"
+                $tempFile = [System.IO.Path]::GetTempFileName()
+                Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/stdout.txt" -File $tempFile -Region $Region -ErrorAction Stop | Out-Null
+                $output = Get-Content -Path $tempFile -Raw
+                Remove-Item -Path $tempFile -Force -Recurse
+            } catch {
+                Write-Error "Unable to read full output from $S3Path"
+                Write-Verbose $_.Exception
+            }
         } else {
             Write-Warning "S3 Output was not specified, unable to fetch full output."
         }
