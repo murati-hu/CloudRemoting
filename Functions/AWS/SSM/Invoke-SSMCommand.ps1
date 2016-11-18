@@ -91,7 +91,10 @@ function Invoke-SSMCommand {
         [switch]$EnableCliXml,
 
         [Parameter()]
-        [System.Int32]$TimeoutSecond
+        [System.Int32]$TimeoutSecond,
+
+        [Parameter()]
+        [System.Int32]$SleepMilliseconds=400
     )
 
     begin {
@@ -184,6 +187,7 @@ function Invoke-SSMCommand {
                 $script:SSMInvocations.Remove($id)
                 Get-SSMCommandResult -CommandId $i.CommandId -InstanceId $id -EnableCliXml:$EnableCliXml
             }
+            Start-Sleep -Milliseconds $SleepMilliseconds
         }
     }
 }
