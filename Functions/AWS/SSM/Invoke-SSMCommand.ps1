@@ -178,7 +178,7 @@ function Invoke-SSMCommand {
         Write-Verbose "Collecting results $($script:SSMInvocations)"
 
         while ($script:SSMInvocations.Keys.Count -gt 0) {
-            $id = $script:SSMInvocations.Keys | Select-Object -First 1
+            $id = $script:SSMInvocations.Keys | Get-Random
             $i = $script:SSMInvocations.$id
             Write-Verbose "Waiting for $($i.InstanceIds) - $($i.CommandId) - $($i.Status) command..."
             $currentCommand=Get-SSMCommand -CommandId $i.CommandId -ErrorAction SilentlyContinue
