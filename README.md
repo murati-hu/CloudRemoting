@@ -30,6 +30,22 @@ Import-Module CloudRemoting
 ```
 
 ## Few Examples
+### Integrated SSM Command execution
+AWS SSM Run-command allows us to execute scripts against EC2 Instances from anywhere
+without direct network connectivity to the targets.
+`Invoke-SSMCommand` is an extension on top of the standard `Send-SSMCommand` to make
+this task even easier and fully integrate this feature to PowerShell pipelines.
+```powershell
+# Execute scripts with SSM Run Command similarly as Invoke-Command
+Get-Ec2Instance i-2492acfc | Invoke-SSMCommand { iisreset }
+
+# Execute SSM alias, with a CLI serialized command via S3 output
+Set-DefaultSSMOutput -BucketName 'ssm-outputs' -KeyPrefix 'logs/'
+Get-Ec2Instance i-2492acfc | ssm { Get-WebSite } -EnableCliXml | Select Name,InstanceId
+```
+![ssm_command](https://cloud.githubusercontent.com/assets/2268036/20460497/82df7c0e-af49-11e6-93f3-acdea3d9aa8c.gif)
+
+
 ### Enter an EC2 Admin RDP Session with Private-Key file
 You can use the `Enter-EC2RdpSession` cmdlet or its `ec2rdp` alias to connect to any EC2 instance as an administrator via RDP.
 ```powershell
@@ -60,18 +76,6 @@ In order to connect to any machine via RDP, you can simply call `Enter-RdpSessio
 # Connect an RDP Session to any machine
 $c = Get-EC2Credential # Or retrieve from a persisted creds
 Enter-RdpSession -ComputerName '207.47.222.251' -Credential $c
-```
-
-### Integrated SSM Command execution
-Running AWS SSM Run commands allow us to execute scripts from anywhere against EC2 Instances, but
-`Invoke-SSMCommand` makes this task even easier to fully integrate this feature to PowerShell pipelines.
-```powershell
-# Execute scripts with SSM Run Command similarly as Invoke-Command
-Get-Ec2Instance i-2492acfc | Invoke-SSMCommand { iisreset }
-
-# Execute SSM alias, with a CLI serialized command via S3 output
-Set-DefaultSSMOutput -BucketName 'ssm-outputs' -KeyPrefix 'logs/'
-Get-Ec2Instance i-2492acfc | ssm { Get-WebSite } -EnableCliXml | Select Name
 ```
 
 ## Documentation
