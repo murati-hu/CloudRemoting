@@ -61,7 +61,7 @@ function Get-SSMCommandResult {
                 Write-Verbose $_.Exception
             }
         } else {
-            Write-Warning "S3 Output was not specified, unable to fetch full output."
+            Write-Warning "Unable to fetch full output. Please specify S3 Output, to receive non-truncated results."
         }
     }
 
