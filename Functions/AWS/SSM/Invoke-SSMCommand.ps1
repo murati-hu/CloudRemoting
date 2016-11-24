@@ -165,7 +165,9 @@ function Invoke-SSMCommand {
             if ($TimeoutSecond) { $SSMCommandArgs.TimeoutSecond = $TimeoutSecond }
 
             try {
-                $ssmCommand=Send-SSMCommand @SSMCommandArgs
+                $ssmCommand=Send-SSMCommand @SSMCommandArgs |
+                    Add-Member -NotePropertyName SSMCommandInputObject -NotePropertyValue $i -PassThru -Force
+
                 $script:SSMInvocations.$id = $ssmCommand
             } catch {
                 Write-Error $_.Exception
@@ -185,7 +187,8 @@ function Invoke-SSMCommand {
 
             if (($null -eq $currentCommand) -or ($currentCommand.Status -imatch 'Success|Fail')) {
                 $script:SSMInvocations.Remove($id)
-                Get-SSMCommandResult -CommandId $i.CommandId -InstanceId $id -EnableCliXml:$EnableCliXml
+                Get-SSMCommandResult -CommandId $i.CommandId -InstanceId $id -EnableCliXml:$EnableCliXml |
+                Add-Member -NotePropertyName SSMCommandInputObject -NotePropertyValue $i.SSMCommandInputObject -PassThru -Force
             }
             Start-Sleep -Milliseconds $SleepMilliseconds
         }
