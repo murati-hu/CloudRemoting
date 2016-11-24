@@ -12,3 +12,4 @@ Set-DefaultEC2Pemfile
 Set-DefaultSSMOutput
 Clear-DefaultSSMOutput
 Invoke-SSMCommand
+Expand-Object
