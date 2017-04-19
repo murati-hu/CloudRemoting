@@ -53,7 +53,7 @@ function Get-SSMCommandResult {
             try {
                 Write-Verbose "Fetching full output from $S3Path"
                 $tempFile = [System.IO.Path]::GetTempFileName()
-                Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/0.awsrunPowerShellScript/stdout" -File $tempFile -Region $Region -ErrorAction Stop | Out-Null
+                Read-S3Object -BucketName $result.OutputS3BucketName -Key "$($result.OutputS3KeyPrefix)/0.awsrunPowerShellScript/stdout.txt" -File $tempFile -Region $Region -ErrorAction Stop | Out-Null
                 $output = Get-Content -Path $tempFile -Raw
                 Remove-Item -Path $tempFile -Force -Recurse
             } catch {
