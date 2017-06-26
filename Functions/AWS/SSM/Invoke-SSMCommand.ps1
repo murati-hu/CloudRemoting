@@ -170,7 +170,7 @@ function Invoke-SSMCommand {
 
                 $script:SSMInvocations.$id = $ssmCommand
             } catch {
-                Write-Error $_.Exception
+                Write-Error -ErrorRecord $_
                 continue
             }
         }
