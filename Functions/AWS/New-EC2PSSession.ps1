@@ -77,7 +77,7 @@ function New-EC2PSSession {
                             return $session
                         }
                     } catch {
-                        Write-Error $_
+                        Write-Error -ErrorRecord $_
                     }
                 }
             } else {
