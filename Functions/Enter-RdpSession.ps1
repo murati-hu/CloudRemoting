@@ -25,7 +25,7 @@ function Enter-RdpSession {
     [CmdletBinding()]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUsePSCredentialType", "Credential")]
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory=$true,Position=1)]
         [string]$ComputerName,
 
         [System.Management.Automation.PSCredential]
