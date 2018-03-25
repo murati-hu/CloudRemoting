@@ -5,6 +5,7 @@ if (Get-Module AWSPowershell -ListAvailable) {
 } else {
     Write-Warning "AWSPowershell is not found, but some of the cmdlets requires it."
     Write-Warning "Please make sure you have installed it for proper functioning."
+    Write-Warning "You can install it by 'PowerShellGet\Install-Module AWSPowershell -Scope CurrentUser' or by 'https://s3.amazonaws.com/aws-cli/AWSCLI64.msi'"
 }
 
 $functionFilter = Join-Path $PSScriptRoot "Functions\*.ps1"

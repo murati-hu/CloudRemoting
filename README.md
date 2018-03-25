@@ -14,13 +14,21 @@ cmdlets by:
 ## Installation
 CloudRemoting is available via [PowerShellGallery][PowerShellGallery] and via
 [PsGet][psget], so you can simply install it with the following command:
+
 ```powershell
 # Install it from PowerShell Gallery with PS5 / psget.net for older PS versions
-Install-Module CloudRemoting
-
-# Or install it directly from this repository with psget.net
-psget\Install-Module -ModuleUrl -ModuleUrl https://github.com/murati-hu/CloudRemoting/archive/latest.zip
+Install-Module CloudRemoting -Scope CurrentUser
 ```
+# Or install it directly from this repository with psget.net
+```powershell
+# Set SSL/TLS
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+# install PsGet
+(new-object Net.WebClient).DownloadString("https://raw.githubusercontent.com/psget/psget/master/GetPsGet.ps1") | iex
+# install/update CloudRemoting
+PsGet\Install-Module -ModuleUrl https://github.com/murati-hu/CloudRemoting/archive/latest.zip -Update
+```
+
 Of course you can download and install the module manually too from
 [Downloads][download]
 
