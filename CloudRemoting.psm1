@@ -2,8 +2,12 @@ Write-Verbose "CloudRemoting module"
 
 if (Get-Module AWSPowershell -ListAvailable) {
     Import-Module AWSPowershell
-} else {
-    Write-Warning "AWSPowershell is not found, but some of the cmdlets requires it."
+}
+elseif (Get-Module AWSPowerShell.NetCore -ListAvailable) {
+    Import-Module AWSPowerShell.NetCore
+}
+else {
+    Write-Warning "AWSPowershell or AWSPowerShell.NetCore is not found, but some of the cmdlets requires it."
     Write-Warning "Please make sure you have installed it for proper functioning."
 }
 
