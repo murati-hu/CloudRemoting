@@ -12,4 +12,4 @@ test_script:
 skip_commits:
   files:
     - '**/*.md'
-    = '**/*.gif'
+    - '**/*.gif'
